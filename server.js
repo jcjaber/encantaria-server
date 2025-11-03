@@ -1,53 +1,66 @@
-// Importa as dependências instaladas:
-// express: para gerenciar o servidor web (embora nosso foco seja Socket.IO, ele é a base).
-// http: Módulo nativo do Node.js necessário para criar o servidor base que o Socket.IO irá usar.
-// Server: A classe do Socket.IO que gerencia a comunicação em tempo real.
+// server.js
+
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const Game = require('./src/models/Game'); // Importa a nova classe Game
 
-// Define a porta do servidor. O padrão profissional usa a variável de ambiente process.env.PORT,
-// mas usamos 3001 como um fallback (valor padrão) para o desenvolvimento local.
 const PORT = process.env.PORT || 3001;
 
-// 1. Inicializa o Express e cria o servidor HTTP
 const app = express();
 const server = http.createServer(app);
 
-// 2. Configura o Socket.IO para o tempo real
-// O 'cors' é crucial: permite que seu Front-end (que estará em outro endereço) se conecte.
 const io = new Server(server, {
     cors: {
-        origin: '*', // Permite qualquer Front-end conectar (ótimo para testes iniciais)
+        origin: '*', 
         methods: ['GET', 'POST'],
     },
 });
 
-console.log('--- Servidor Encantaria - Iniciando ---');
-console.log(`Porta: ${PORT}`);
+// --- NOVO: Variável global para gerenciar a fila de espera ---
+const waitingPlayers = [];
+let activeGame = null; // Usado para armazenar a instância da partida
 
-// 3. O Coração do Socket.IO: Monitora Novas Conexões
-// io.on('connection') dispara sempre que um cliente (jogador) se conecta.
+console.log('--- Servidor Encantaria - Iniciando ---');
+
 io.on('connection', (socket) => {
-    // 'socket' é o objeto que representa a conexão individual com este único jogador.
     console.log(`✅ Usuário conectado: ID ${socket.id}`);
 
-    // EX: Ouvindo um evento que o cliente enviará quando quiser procurar uma partida.
-    socket.on('iniciar_busca_partida', (_data) => {
-        console.log(`Pedido de busca de partida de ${socket.id}.`);
+    // Adiciona o jogador à fila de espera (Simulação de Matchmaking)
+    waitingPlayers.push(socket);
+    socket.emit('servidor_status', { message: 'Conectado. Aguardando outro jogador...' });
+
+    if (waitingPlayers.length >= 2) {
+        console.log("MATCH FOUND: Iniciando partida!");
         
-        // socket.emit envia uma mensagem APENAS para o jogador que enviou o evento.
-        socket.emit('servidor_status', { message: 'Busca por partida iniciada. Aguarde...' });
+        const player1Socket = waitingPlayers.shift();
+        const player2Socket = waitingPlayers.shift();
+        
+        // Cria a instância do Game
+        activeGame = new Game(player1Socket, player2Socket);
+        
+        // Inicia o jogo
+        activeGame.startGame();
+    }
+    
+    // --- NOVO: Evento para terminar o turno (usaremos no teste) ---
+    socket.on('end_turn', () => {
+        if (activeGame) {
+            activeGame.endTurn(socket.id);
+        }
     });
 
-    // Evento disparado quando o cliente fecha a aba ou perde a conexão.
+    // Evento de desconexão
     socket.on('disconnect', () => {
         console.log(`❌ Usuário desconectado: ID ${socket.id}`);
+        // Remove da fila ou encerra a partida se ele era o ativo
+        if (waitingPlayers.includes(socket)) {
+             waitingPlayers.splice(waitingPlayers.indexOf(socket), 1);
+        }
     });
 });
 // -------------------------------------
 
-// 4. Faz o servidor começar a ouvir requisições na porta definida
 server.listen(PORT, () => {
     console.log(`Servidor de Encantaria rodando em http://localhost:${PORT}`);
 });
