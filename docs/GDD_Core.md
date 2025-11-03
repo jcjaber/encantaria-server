@@ -33,9 +33,10 @@ Todos os Lacaios devem ter os seguintes atributos de estado para o combate:
 
 ## 3. Arquétipo Inicial: Guerreiro
 
-| Elemento          | Regra                                              |
-| :---------------- | :------------------------------------------------- |
-| **Herói**         | Zumbi dos Palmares                                 |
-| **Poder Heroico** | Grito de Liberdade                                 |
-| **Custo**         | 2 Axé                                              |
-| **Efeito**        | Opção 1: Ganha 2 Armadura OU Opção 2: Causa 1 Dano |
+| Elemento | Regra |
+| :--- | :--- |
+| **Classe** | Guerreiro |
+| **Herói** | Zumbi dos Palmares |
+| **Poder Heroico**| **Fortificar** |
+| **Custo** | 2 Axé |
+| **Efeito** | **Ganha 2 de Armadura.** |
