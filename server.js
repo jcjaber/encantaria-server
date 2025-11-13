@@ -17,7 +17,7 @@ const io = new Server(server, {
     },
 });
 
-// --- NOVO: Variável global para gerenciar a fila de espera ---
+// --- Variável global para gerenciar a fila de espera ---
 const waitingPlayers = [];
 let activeGame = null; // Usado para armazenar a instância da partida
 
@@ -42,8 +42,23 @@ io.on('connection', (socket) => {
         // Inicia o jogo
         activeGame.startGame();
     }
+
+    // --- Evento para usar o Poder Heroico ---
+    socket.on('use_hero_power', () => {
+        if (activeGame) {
+            // Chama o novo método em Game.js, passando o ID do jogador
+            activeGame.processHeroPower(socket.id); 
+        }
+    });
+
+    // Evento para terminar o turno
+    socket.on('end_turn', () => {
+        if (activeGame) {
+            activeGame.endTurn(socket.id);
+        }
+    });
     
-    // --- NOVO: Evento para terminar o turno (usaremos no teste) ---
+    // --- Evento para terminar o turno (usaremos no teste) ---
     socket.on('end_turn', () => {
         if (activeGame) {
             activeGame.endTurn(socket.id);

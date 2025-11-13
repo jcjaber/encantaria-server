@@ -39,6 +39,27 @@ class Player {
         }
         this.currentEncante = this.maxEncante;
     }
+
+    /**
+     * Move a carta do topo do deck para a mão.
+     * Implementa a lógica básica de Fatiga (dano se o deck estiver vazio).
+     * @returns {Object} O resultado do saque (carta ou fadiga).
+     */
+    
+    drawCard() {
+        if (this.deck.length === 0) {
+            // Lógica básica de Fadiga (FUTURO: Implementar dano de Fadiga)
+            const fatigueDamage = 1; // Deve ser rastreado por jogador
+            this.takeDamage(fatigueDamage);
+            return { type: 'FATIGUE', damage: fatigueDamage, hp: this.hp };
+        }
+        
+        // Remove a primeira carta do array (topo do deck)
+        const card = this.deck.shift(); 
+        this.hand.push(card);
+        
+        return { type: 'CARD', card: card, handSize: this.hand.length };
+    }
     
     takeDamage(damage) {
         let remainingDamage = damage;

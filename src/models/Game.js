@@ -57,6 +57,14 @@ class Game {
         this.status = 'RUNNING';
         this.activePlayer = this.player1; 
         this.turnCount = 1;
+
+        // Compra inicial (3 cartas para o P1, 4 para o P2 - P2 tem a moeda).
+        // Por enquanto, simplificamos para 3 para ambos.
+        for (let i = 0; i < 3; i++) {
+            this.player1.drawCard();
+            this.player2.drawCard();
+        }
+
         this.emitGameStatus(`A partida começou! ${this.activePlayer.heroName} começa.`);
         this.startTurn();
     }
@@ -76,11 +84,42 @@ class Game {
         
         active.startTurn(); 
         
+        // Fase de Compra (Chama o drawCard)
+        const drawResult = active.drawCard();
+
+        if (drawResult.type === 'CARD') {
+            this.emitGameStatus(`${active.heroName} sacou uma carta.`);
+        }
+
+        // Permite que Lacaios que estavam em Sleep acordem para atacar
+        active.field.forEach(minion => { minion.isSleep = false; });
+
         this.emitGameUpdate(); 
         // Comunicação usando 'encante'
         this.emitToPlayer(active.socketId, 'YOUR_TURN', { encante: active.currentEncante });
     }
     
+    // Processa o uso do Poder Heroico
+    processHeroPower(playerId) {
+        const player = this.players[playerId];
+
+        if (player.socketId !== this.activePlayer.socketId) {
+            this.emitToPlayer(playerId, 'action_error', { message: 'Não é o seu turno!' });
+            return;
+        }
+
+        // NO FUTURO: Checar se o poder já foi usado neste turno
+
+        const result = player.useHeroPower(); 
+
+        if (result.success) {
+            this.emitGameStatus(result.message);
+            this.emitGameUpdate(); 
+        } else {
+            this.emitToPlayer(playerId, 'action_error', { message: result.message });
+        }
+    }
+
     endTurn(endingPlayerId) {
         if (this.activePlayer.socketId !== endingPlayerId) return;
 

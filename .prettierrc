@@ -1,7 +1,7 @@
 {
-  "semi": true,          // Adiciona ponto e vírgula
-  "singleQuote": true,   // Usa aspas simples
-  "trailingComma": "es5",// Adiciona vírgulas no final de objetos e arrays
-  "tabWidth": 4,         // Usa 4 espaços para indentação
-  "arrowParens": "always"// Garante parênteses em arrow functions
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "tabWidth": 4,
+  "arrowParens": "always"
 }
