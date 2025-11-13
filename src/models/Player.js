@@ -2,7 +2,7 @@
 
 /**
  * Representa um Jogador genérico no jogo Encantaria.
- * Gerencia o estado básico (HP, Axé) e delega o poder heróico para a classe específica.
+ * Gerencia o estado básico (HP, Encante) e delega o poder heróico para a classe específica.
  */
 class Player {
     /**
@@ -13,38 +13,38 @@ class Player {
         this.socketId = socketId;
         this.heroPower = heroPower; 
         
-        // Dados do Herói (Cosmético, nome temático em Português)
-        this.heroName = "Zumbi dos Palmares"; 
+        // Dados do Herói (Cosmético)
+        this.heroName = 'Zumbi dos Palmares'; 
 
-        // --- Estado Básico do Herói (Nomenclatura em Inglês) ---
+        // --- Estado Básico do Herói ---
         this.hp = 30;         
-        this.armor = 0; // CORREÇÃO: Usar "armor" (Inglês) para Armadura
+        this.armor = 0; // Armadura
         this.isAlive = true;  
 
-        // --- Sistema de Recursos (Axé) - Nomenclatura em Inglês ---
-        this.maxAxe = 1;      
-        this.currentAxe = 1; 
+        // --- Sistema de Recursos (Encante) ---
+        this.maxEncante = 1;      
+        this.currentEncante = 1; 
         
         // --- Coleções de Cartas ---
         this.deck = [];       
         this.hand = [];       
-        this.field = [];      // CORREÇÃO: Usar "field" (Inglês) para Campo de Batalha
+        this.field = [];      // Lacaios em campo
         this.graveyard = [];  
     }
     
     // --- Métodos de Jogo (Genéricos) ---
     startTurn() {
-        if (this.maxAxe < 10) {
-            this.maxAxe += 1; 
+        if (this.maxEncante < 10) {
+            this.maxEncante += 1; 
         }
-        this.currentAxe = this.maxAxe;
+        this.currentEncante = this.maxEncante;
     }
     
     takeDamage(damage) {
         let remainingDamage = damage;
         
         // Lógica de Armadura e Dano
-        if (this.armor > 0) { // CORREÇÃO: Usando "armor"
+        if (this.armor > 0) {
             this.armor -= remainingDamage;
             if (this.armor < 0) {
                 remainingDamage = Math.abs(this.armor); 
